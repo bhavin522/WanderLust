@@ -1,0 +1,47 @@
+<%- layout('layouts/boilerplate') %>
+
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="text-center mb-4" style="color: #ff6f61;">Your Favorite Listings</h1>
+                <% if (favorites.length===0) { %>
+                    <div class="alert alert-info text-center">
+                        <p>You don't have any favorite listings yet.</p>
+                        <a href="/listings" class="btn btn-primary mt-2"
+                            style="background-color: #ff6f61; border: none;">Browse Listings</a>
+                    </div>
+                    <% } %>
+            </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <% for (let listing of favorites) { %>
+                <div class="col">
+                    <div class="card listing-card h-100 position-relative"
+                        style="box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+                        <a href="/listings/<%= listing._id %>" class="text-decoration-none">
+                            <img class="card-img-top rounded-3"
+                                src="<%= listing.image && listing.image.url || '/images/default-listing.jpg' %>"
+                                alt="Listing image" />
+                            <div class="card-img-overlay"></div>
+                            <div class="card-body">
+                                <p class="card-text">
+                                    <b style="color: #ff6f61;">
+                                        <%= listing.title %>
+                                    </b><br />
+                                    &#8377; <%= listing.price ? listing.price.toLocaleString('en-IN') : 'N/A' %>
+                                </p>
+                            </div>
+                        </a>
+                        <form action="/user/favorites/<%= listing._id %>?_method=DELETE" method="POST"
+                            class="position-absolute" style="top: 10px; right: 10px;">
+                            <button class="btn btn-sm btn-danger rounded-circle"
+                                style="background-color: #ff6f61; border: none;">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <% } %>
+        </div>
+    </div>

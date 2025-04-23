@@ -1,0 +1,170 @@
+<% layout('/layouts/boilerplate.ejs') %>
+  <div class="container-fluid px-0">
+    <!-- Advanced Search Filters -->
+    <div class="search-filters">
+      <h5 style="color: #ff6f61;">Find your perfect place</h5>
+      <form action="/listings" method="GET" id="filterForm">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" class="form-control" id="locationFilter" name="location" placeholder="Location">
+              <label for="locationFilter">Location</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <select class="form-select" id="countryFilter" name="country">
+                <option value="" selected>Any Country</option>
+                <option value="India">India</option>
+                <option value="United States">United States</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Australia">Australia</option>
+                <option value="Japan">Japan</option>
+              </select>
+              <label for="countryFilter">Country</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-6">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="Min Price">
+                  <label for="minPrice">Min Price</label>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-floating">
+                  <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="Max Price">
+                  <label for="maxPrice">Max Price</label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-12 d-grid d-md-flex justify-content-md-center">
+            <button type="submit" class="btn btn-primary" style="background-color: #ff6f61; border: none;">
+              <i class="fa-solid fa-magnifying-glass me-2"></i>Search
+            </button>
+            <button type="reset" class="btn btn-outline-secondary ms-md-3 mt-2 mt-md-0" id="resetFilters">
+              <i class="fa-solid fa-undo me-2"></i>Reset Filters
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="filters">
+      <div class="filter-item">
+        <i class="fa-solid fa-fire"></i>
+        <p>Trending</p>
+      </div>
+      <div class="filter-item">
+        <i class="fa-solid fa-bed"></i>
+        <p>Rooms</p>
+      </div>
+      <div class="filter-item">
+        <i class="fa-solid fa-umbrella-beach"></i>
+        <p>Beach</p>
+      </div>
+      <div class="filter-item">
+        <i class="fa-solid fa-bed"></i>
+        <p>Farm</p>
+      </div>
+      <div class="filter-item d-none d-md-block">
+        <i class="fa-solid fa-sailboat"></i>
+        <p>Boats</p>
+      </div>
+      <div class="filter-item d-none d-md-block">
+        <i class="fa-solid fa-campground"></i>
+        <p>Camping</p>
+      </div>
+      <div class="filter-item d-none d-md-block">
+        <i class="fa-solid fa-building"></i>
+        <p>Tower</p>
+      </div>
+      <div class="filter-item d-none d-md-block">
+        <i class="fa-solid fa-person-swimming"></i>
+        <p>Pool</p>
+      </div>
+      <div class="filter-item d-none d-md-block">
+        <i class="fa-solid fa-dumbbell"></i>
+        <p>Gym</p>
+      </div>
+
+      <!-- Simple tax switch -->
+      <div class="simple-tax-switch">
+        <label>
+          <span>Price after tax</span>
+          <input type="checkbox" id="flexSwitchCheckDefault">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Listings Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      <% for (let Listing of allListing) { %>
+        <div class="col">
+          <a href="/listings/<%= Listing._id %>" class="listing-link">
+            <div class="card listing-card h-100"
+              style="box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.3s ease;">
+              <img class="card-img-top rounded-3"
+                src="<%= Listing.image && Listing.image.url || '/images/default-listing.jpg' %>" alt="Listing image" />
+              <div class="card-img-overlay"></div>
+              <div class="card-body">
+                <p class="card-text">
+                  <b style="color: #ff6f61;">
+                    <%= Listing.title %>
+                  </b><br />
+                  &#8377; <%= Listing.price ? Listing.price.toLocaleString('en-IN') : 'N/A' %>
+                    <i class="tax-info"> &nbsp; +18% GST</i>
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+        <% } %>
+    </div>
+  </div>
+
+  <script>
+    // Tax switch functionality
+    const taxswitch = document.getElementById('flexSwitchCheckDefault');
+    taxswitch.addEventListener('change', () => {
+      let taxinfo = document.querySelectorAll('.tax-info');
+      for (info of taxinfo) {
+        if (info.style.display != 'inline') {
+          info.style.display = 'inline';
+        } else {
+          info.style.display = 'none';
+        }
+      }
+    });
+
+    // Reset filters and redirect to base listings page
+    document.getElementById('resetFilters').addEventListener('click', (event) => {
+      event.preventDefault();
+      window.location.href = '/listings';
+    });
+
+    // Populate filters from URL params
+    document.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+
+      // Set form values from URL parameters
+      if (urlParams.has('location')) {
+        document.getElementById('locationFilter').value = urlParams.get('location');
+      }
+      if (urlParams.has('country')) {
+        document.getElementById('countryFilter').value = urlParams.get('country');
+      }
+      if (urlParams.has('minPrice')) {
+        document.getElementById('minPrice').value = urlParams.get('minPrice');
+      }
+      if (urlParams.has('maxPrice')) {
+        document.getElementById('maxPrice').value = urlParams.get('maxPrice');
+      }
+    });
+  </script>
